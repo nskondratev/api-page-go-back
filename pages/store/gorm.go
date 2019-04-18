@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/nskondratev/api-page-go-back/logger"
 	"github.com/nskondratev/api-page-go-back/pages"
@@ -60,11 +61,28 @@ func (ps *Gorm) List(offset, limit int, sort string, descending bool, query stri
 }
 
 func (ps *Gorm) Update(p *pages.Page) error {
-	return ps.db.Save(&p).Error
+	res := ps.db.Save(&p)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("[pages.store.gorm] page with id = %d was not updated", p.ID)
+	}
+
+	return nil
 }
 
 func (ps *Gorm) Delete(p *pages.Page) error {
-	return ps.db.Delete(p).Error
+	res := ps.db.Delete(p)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("[pages.store.gorm] page with id = %d was not deleted", p.ID)
+	}
+	return nil
 }
 
 func (ps *Gorm) Create(p *pages.Page) error {
