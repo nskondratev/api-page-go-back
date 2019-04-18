@@ -8,6 +8,7 @@ import (
 
 type MysqlDBConfig struct {
 	ConnectionString string
+	LogEnabled       bool
 }
 
 func NewGorm(conf *MysqlDBConfig) (*gorm.DB, error) {
@@ -21,7 +22,7 @@ func NewGorm(conf *MysqlDBConfig) (*gorm.DB, error) {
 	db.DB().SetMaxIdleConns(5)
 	db.DB().SetMaxOpenConns(20)
 
-	db.LogMode(true)
+	db.LogMode(conf.LogEnabled)
 
 	return db, nil
 }
