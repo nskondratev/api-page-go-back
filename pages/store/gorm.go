@@ -61,7 +61,16 @@ func (ps *Gorm) List(offset, limit int, sort string, descending bool, query stri
 }
 
 func (ps *Gorm) Update(p *pages.Page) error {
-	res := ps.db.Save(&p)
+	res := ps.db.First(&pages.Page{}, p.ID)
+
+	if res.Error != nil {
+		if gorm.IsRecordNotFoundError(res.Error) {
+			return fmt.Errorf("[pages.store.gorm] page with id = %d does not exist", p.ID)
+		}
+		return res.Error
+	}
+
+	res = ps.db.Save(&p)
 
 	if res.Error != nil {
 		return res.Error
