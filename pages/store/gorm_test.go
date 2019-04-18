@@ -2,11 +2,11 @@ package store
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/nskondratev/api-page-go-back/db"
 	"github.com/nskondratev/api-page-go-back/pages"
-	"os"
+	"github.com/nskondratev/api-page-go-back/testutils"
 	"strings"
 	"testing"
+	"time"
 )
 
 type gormCreateTestCase struct {
@@ -17,8 +17,8 @@ type gormCreateTestCase struct {
 
 func TestGorm_Create(t *testing.T) {
 	d, ps := setup(t)
-	createPagesTable(d)
-	defer dropPagesTable(d)
+	testutils.CreatePagesTable(d)
+	defer testutils.DropPagesTable(d)
 
 	cases := []gormCreateTestCase{
 		{&pages.Page{Title: "Page 1", Text: "Page 1 text"}, 1, true},
@@ -42,7 +42,7 @@ func TestGorm_Create(t *testing.T) {
 				t.Errorf("[%d] Can not fetch created page: %s", caseNum, err.Error())
 			}
 
-			if !comparePagesPart(item.pageToCreate, p) {
+			if !testutils.ComparePagesPart(item.pageToCreate, p) {
 				t.Errorf("[%d] Created and fetched pages mismatch. Wanted: %+v, received: %+v", caseNum, item.pageToCreate, p)
 			}
 		}
@@ -58,8 +58,8 @@ type gormGetByIdTestCase struct {
 
 func TestGorm_GetById(t *testing.T) {
 	d, ps := setup(t)
-	createPagesTable(d)
-	defer dropPagesTable(d)
+	testutils.CreatePagesTable(d)
+	defer testutils.DropPagesTable(d)
 
 	p := &pages.Page{
 		Title: "Page 1",
@@ -84,7 +84,7 @@ func TestGorm_GetById(t *testing.T) {
 			t.Errorf("[%d] should return error", caseNum)
 		}
 
-		if item.expectedPage != nil && !comparePagesPart(item.expectedPage, receivedPage) {
+		if item.expectedPage != nil && !testutils.ComparePagesPart(item.expectedPage, receivedPage) {
 			t.Errorf("[%d] Fetched pages mismatch. Wanted: %+v, received: %+v", caseNum, item.expectedPage, receivedPage)
 		}
 	}
@@ -98,8 +98,8 @@ type gormDeleteTestCase struct {
 
 func TestGorm_Delete(t *testing.T) {
 	d, ps := setup(t)
-	createPagesTable(d)
-	defer dropPagesTable(d)
+	testutils.CreatePagesTable(d)
+	defer testutils.DropPagesTable(d)
 
 	p := &pages.Page{
 		Title: "Page 1",
@@ -140,8 +140,8 @@ type gormUpdateTestCase struct {
 
 func TestGorm_Update(t *testing.T) {
 	d, ps := setup(t)
-	createPagesTable(d)
-	defer dropPagesTable(d)
+	testutils.CreatePagesTable(d)
+	defer testutils.DropPagesTable(d)
 
 	p := &pages.Page{
 		Title: "Page 1",
@@ -176,8 +176,80 @@ func TestGorm_Update(t *testing.T) {
 				t.Errorf("[%d] Can not fetch updated page: %s", caseNum, err.Error())
 			}
 
-			if !comparePagesPart(p, item.expectedPage) {
+			if !testutils.ComparePagesPart(p, item.expectedPage) {
 				t.Errorf("[%d] Fetched pages mismatch. Wanted: %+v, received: %+v", caseNum, item.expectedPage, p)
+			}
+		}
+	}
+}
+
+type gormListTestCase struct {
+	offset         int
+	limit          int
+	sort           string
+	descending     bool
+	query          string
+	expectedResult []*pages.PageList
+	expectedTotal  int
+	isErrorNil     bool
+}
+
+func TestGorm_List(t *testing.T) {
+	d, ps := setup(t)
+	testutils.CreatePagesTable(d)
+	defer testutils.DropPagesTable(d)
+
+	pagesToCreate := []*pages.Page{
+		{Title: "Page 1", Text: "Page 1 text", CreatedAt: time.Now().Local().Add(time.Second * -3), UpdatedAt: time.Now().Local().Add(time.Second * -3)},
+		{Title: "Page query 2", Text: "Page 2 text", CreatedAt: time.Now().Local().Add(time.Second * -2), UpdatedAt: time.Now().Local().Add(time.Second * -2)},
+		{Title: "Test page 3", Text: "Page 3 text", CreatedAt: time.Now().Local().Add(time.Second * -1), UpdatedAt: time.Now().Local().Add(time.Second * -1)},
+	}
+
+	for _, p := range pagesToCreate {
+		if err := ps.Create(p); err != nil {
+			t.Fatalf("Failed to create test page: %s", err.Error())
+		}
+	}
+
+	pl := make([]*pages.PageList, len(pagesToCreate), len(pagesToCreate))
+
+	for i, p := range pagesToCreate {
+		pl[i] = &pages.PageList{
+			ID:        p.ID,
+			Title:     p.Title,
+			CreatedAt: p.CreatedAt,
+			UpdatedAt: p.UpdatedAt,
+		}
+	}
+
+	cases := []gormListTestCase{
+		{0, 5, "", false, "", []*pages.PageList{pl[0], pl[1], pl[2]}, 3, true},
+		{0, 5, "", true, "", []*pages.PageList{pl[2], pl[1], pl[0]}, 3, true},
+		{0, 5, "title", false, "", []*pages.PageList{pl[0], pl[1], pl[2]}, 3, true},
+		{0, 5, "title", true, "", []*pages.PageList{pl[2], pl[1], pl[0]}, 3, true},
+		{0, -1, "", false, "", []*pages.PageList{pl[0], pl[1], pl[2]}, 3, true},
+		{1, 1, "", false, "", []*pages.PageList{pl[1]}, 3, true},
+		{1, 2, "", false, "", []*pages.PageList{pl[1], pl[2]}, 3, true},
+		{0, 5, "", false, "page", []*pages.PageList{pl[0], pl[1], pl[2]}, 3, true},
+		{0, 5, "", false, "query", []*pages.PageList{pl[1]}, 1, true},
+		{0, 5, "unknownSortKey", false, "query", []*pages.PageList{}, 0, false},
+	}
+
+	for caseNum, item := range cases {
+		receivedList, receivedTotal, err := ps.List(item.offset, item.limit, item.sort, item.descending, item.query)
+		if item.isErrorNil && err != nil {
+			t.Errorf("[%d] error while fetching list: %s", caseNum, err.Error())
+		} else if !item.isErrorNil && err == nil {
+			t.Errorf("[%d] error should be not nil", caseNum)
+		}
+
+		if item.isErrorNil {
+			if receivedTotal != item.expectedTotal {
+				t.Errorf("[%d] total mismatch. want: %d, received: %d", caseNum, item.expectedTotal, receivedTotal)
+			}
+
+			if !pageListsEqual(receivedList, item.expectedResult) {
+				t.Errorf("[%d] list mismatch. want: %+v, received: %+v", caseNum, item.expectedResult, receivedList)
 			}
 		}
 	}
@@ -186,13 +258,7 @@ func TestGorm_Update(t *testing.T) {
 // Utility functions
 
 func setup(t *testing.T) (*gorm.DB, pages.Store) {
-	connStr := os.Getenv("DB_CONNECTION_STRING")
-	if len(connStr) < 1 {
-		connStr = "api_page:api_page@/api_page_test?charset=utf8&parseTime=True"
-	}
-	d, err := db.NewGorm(&db.MysqlDBConfig{
-		ConnectionString: connStr,
-	})
+	d, err := testutils.NewGormTestDB()
 
 	if err != nil {
 		t.Fatalf("Error while establishing connection")
@@ -205,14 +271,17 @@ func setup(t *testing.T) (*gorm.DB, pages.Store) {
 	return d, ps
 }
 
-func createPagesTable(d *gorm.DB) {
-	d.AutoMigrate(&pages.Page{})
-}
+func pageListsEqual(pl1, pl2 []*pages.PageList) bool {
+	if len(pl1) != len(pl2) {
+		return false
+	}
 
-func dropPagesTable(d *gorm.DB) {
-	d.DropTable(&pages.Page{})
-}
+	for i, pl1item := range pl1 {
+		pl2item := pl2[i]
+		if !testutils.ComparePagesListPart(pl1item, pl2item) {
+			return false
+		}
+	}
 
-func comparePagesPart(p1, p2 *pages.Page) bool {
-	return p1.ID == p2.ID && strings.Compare(p1.Title, p2.Title) == 0 && strings.Compare(p1.Text, p2.Text) == 0
+	return true
 }
