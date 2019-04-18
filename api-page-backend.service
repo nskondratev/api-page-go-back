@@ -1,0 +1,12 @@
+[Unit]
+Description=API Page back-end app written in Go
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+WorkingDirectory=/home/application/api-page-v3.0.0
+ExecStart=/home/application/api-page-v3.0.0/api-page-backend
+
+[Install]
+WantedBy=multi-user.target

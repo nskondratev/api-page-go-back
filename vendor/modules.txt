@@ -1,0 +1,66 @@
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+github.com/dgrijalva/jwt-go
+# github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a
+github.com/facebookgo/clock
+# github.com/facebookgo/grace v0.0.0-20180706040059-75cf19382434
+github.com/facebookgo/grace/gracehttp
+github.com/facebookgo/grace/gracenet
+# github.com/facebookgo/httpdown v0.0.0-20180706035922-5979d39b15c2
+github.com/facebookgo/httpdown
+# github.com/facebookgo/stats v0.0.0-20151006221625-1b76add642e4
+github.com/facebookgo/stats
+# github.com/go-playground/locales v0.12.1
+github.com/go-playground/locales
+github.com/go-playground/locales/currency
+# github.com/go-playground/universal-translator v0.16.0
+github.com/go-playground/universal-translator
+# github.com/go-sql-driver/mysql v1.4.1
+github.com/go-sql-driver/mysql
+# github.com/gorilla/websocket v1.4.0
+github.com/gorilla/websocket
+# github.com/graphql-go/graphql v0.7.8
+github.com/graphql-go/graphql
+github.com/graphql-go/graphql/gqlerrors
+github.com/graphql-go/graphql/language/ast
+github.com/graphql-go/graphql/language/kinds
+github.com/graphql-go/graphql/language/parser
+github.com/graphql-go/graphql/language/printer
+github.com/graphql-go/graphql/language/source
+github.com/graphql-go/graphql/language/visitor
+github.com/graphql-go/graphql/language/location
+github.com/graphql-go/graphql/language/lexer
+github.com/graphql-go/graphql/language/typeInfo
+# github.com/jinzhu/gorm v1.9.4
+github.com/jinzhu/gorm
+github.com/jinzhu/gorm/dialects/mysql
+# github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
+github.com/jinzhu/inflection
+# github.com/joho/godotenv v1.3.0
+github.com/joho/godotenv
+# github.com/labstack/echo v3.3.10+incompatible
+github.com/labstack/echo
+github.com/labstack/echo/middleware
+# github.com/labstack/gommon v0.2.8
+github.com/labstack/gommon/log
+github.com/labstack/gommon/color
+github.com/labstack/gommon/bytes
+github.com/labstack/gommon/random
+# github.com/leodido/go-urn v1.1.0
+github.com/leodido/go-urn
+# github.com/mattn/go-colorable v0.1.1
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.7
+github.com/mattn/go-isatty
+# github.com/valyala/bytebufferpool v1.0.0
+github.com/valyala/bytebufferpool
+# github.com/valyala/fasttemplate v1.0.1
+github.com/valyala/fasttemplate
+# golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
+golang.org/x/crypto/acme/autocert
+golang.org/x/crypto/acme
+# golang.org/x/sys v0.0.0-20190222072716-a9d3bda3a223
+golang.org/x/sys/unix
+# google.golang.org/appengine v1.4.0
+google.golang.org/appengine/cloudsql
+# gopkg.in/go-playground/validator.v9 v9.28.0
+gopkg.in/go-playground/validator.v9
