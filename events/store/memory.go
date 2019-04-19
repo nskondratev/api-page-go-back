@@ -29,9 +29,7 @@ func NewMemory(c *MemoryConfig) *Memory {
 }
 
 func (s *Memory) GetById(id uint64) (*events.Event, error) {
-	s.logger.Debugf("events.memory store GetById method call. page id = %d", id)
 	for _, p := range s.records {
-		s.logger.Debugf("compare with event id %d", p.ID)
 		if p.ID == id {
 			return p, nil
 		}
@@ -67,7 +65,6 @@ func (s *Memory) List(offset, limit int, sort string, descending bool, eType, qu
 }
 
 func (s *Memory) Update(e *events.Event) error {
-	s.logger.Debugf("events.memory store update method call. event id = %d", e.ID)
 	e.UpdatedAt = time.Now()
 	s.mu.Lock()
 	for i, el := range s.records {
@@ -81,7 +78,6 @@ func (s *Memory) Update(e *events.Event) error {
 }
 
 func (s *Memory) Delete(e *events.Event) error {
-	s.logger.Debugf("events.memory store delete method call. event id = %d", e.ID)
 	s.mu.Lock()
 	for i, el := range s.records {
 		if el.ID == e.ID {
