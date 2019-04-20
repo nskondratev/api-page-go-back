@@ -27,7 +27,7 @@ var (
 
 func TestHandler_CreatePage(t *testing.T) {
 	// Setup
-	e, h, _ := setup()
+	e, h, _ := setupPageHandlerTest()
 
 	cases := []handlerCreatePageTestCase{
 		{`{"page":{"title":"page1","text":"Page 1 text"}}`, http.StatusOK, `"id":1,"title":"page1","text":"Page 1 text"`},
@@ -64,7 +64,7 @@ type handlerGetPageTestCase struct {
 }
 
 func TestHandler_GetPage(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	_ = ps.Create(&pages.Page{
 		Title: "Page 1",
@@ -108,7 +108,7 @@ type handlerDeletePageTestCase struct {
 }
 
 func TestHandler_DeletePage(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	_ = ps.Create(&pages.Page{
 		Title: "Page 1",
@@ -152,7 +152,7 @@ type handlerUpdatePageTestCase struct {
 }
 
 func TestHandler_UpdatePage(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	_ = ps.Create(&pages.Page{
 		Title: "Page 1",
@@ -203,7 +203,7 @@ type handlerListPagesTestCase struct {
 }
 
 func TestHandler_ListPages(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	pagesToCreate := []*pages.Page{
 		{Title: "Page 1", Text: "Page 1 text"},
@@ -299,7 +299,7 @@ func TestHandler_ListPages(t *testing.T) {
 	}
 }
 
-func setup() (*echo.Echo, *Handler, *store.Memory) {
+func setupPageHandlerTest() (*echo.Echo, *Handler, *store.Memory) {
 	e := router.New()
 
 	ps := store.NewMemory(&store.MemoryConfig{
