@@ -1,6 +1,8 @@
 package testutils
 
-import "github.com/nskondratev/api-page-go-back/util"
+import (
+	"github.com/nskondratev/api-page-go-back/util"
+)
 
 func NewArrayNullStringFromStrings(in []string) ([]util.NullString, error) {
 	res := make([]util.NullString, len(in), len(in))
