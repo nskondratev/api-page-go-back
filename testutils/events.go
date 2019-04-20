@@ -1,9 +1,25 @@
 package testutils
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/nskondratev/api-page-go-back/events"
 	"strings"
 )
+
+func CreateEventsTable(db *gorm.DB) {
+	db.AutoMigrate(&events.Event{}).AutoMigrate(&events.Field{})
+}
+
+func DropEventsTable(db *gorm.DB) {
+	db.DropTable(&events.Field{}).DropTable(&events.Event{})
+}
+
+func CompareEventsListPart(e1, e2 *events.EventList) bool {
+	return e1.ID == e2.ID &&
+		strings.Compare(e1.Constant, e2.Constant) == 0 &&
+		strings.Compare(e1.Value, e2.Value) == 0 &&
+		strings.Compare(e1.Label.String, e2.Label.String) == 0
+}
 
 func CompareEventsPart(e1, e2 *events.Event) bool {
 	return e1.ID == e2.ID &&
