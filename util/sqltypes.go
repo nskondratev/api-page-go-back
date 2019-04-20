@@ -21,3 +21,11 @@ func (ns *NullString) UnmarshalJSON(b []byte) error {
 	ns.Valid = err == nil
 	return err
 }
+
+func NewNullStringFromString(s string) (NullString, error) {
+	res := NullString{}
+	if err := res.Scan(s); err != nil {
+		return res, err
+	}
+	return res, nil
+}

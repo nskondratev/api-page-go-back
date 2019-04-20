@@ -14,22 +14,11 @@ import (
 	"testing"
 )
 
-type handlerCreatePageTestCase struct {
-	inputData                 string
-	responseCode              int
-	responseBodyShouldContain string
-}
-
-var (
-	emptyStr            = ""
-	emptyQueryParamsMap = map[string]string{}
-)
-
 func TestHandler_CreatePage(t *testing.T) {
 	// Setup
-	e, h, _ := setup()
+	e, h, _ := setupPageHandlerTest()
 
-	cases := []handlerCreatePageTestCase{
+	cases := []handlerCreateTestCase{
 		{`{"page":{"title":"page1","text":"Page 1 text"}}`, http.StatusOK, `"id":1,"title":"page1","text":"Page 1 text"`},
 		{`{"page":{"title":"page1","text":"Page 1 text}`, http.StatusUnprocessableEntity, emptyStr},
 		{`{"page":{"text":"Page 1 text"}}`, http.StatusUnprocessableEntity, emptyStr},
@@ -57,21 +46,15 @@ func TestHandler_CreatePage(t *testing.T) {
 	}
 }
 
-type handlerGetPageTestCase struct {
-	id                        string
-	responseCode              int
-	responseBodyShouldContain string
-}
-
 func TestHandler_GetPage(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	_ = ps.Create(&pages.Page{
 		Title: "Page 1",
 		Text:  "Page 1 text",
 	})
 
-	cases := []handlerGetPageTestCase{
+	cases := []handlerGetTestCase{
 		{"1", http.StatusOK, `"id":1,"title":"Page 1","text":"Page 1 text"`},
 		{"badparam", http.StatusUnprocessableEntity, emptyStr},
 		{"45", http.StatusNotFound, `"error":"Not found"`},
@@ -101,21 +84,15 @@ func TestHandler_GetPage(t *testing.T) {
 	}
 }
 
-type handlerDeletePageTestCase struct {
-	id                        string
-	responseCode              int
-	responseBodyShouldContain string
-}
-
 func TestHandler_DeletePage(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	_ = ps.Create(&pages.Page{
 		Title: "Page 1",
 		Text:  "Page 1 text",
 	})
 
-	cases := []handlerDeletePageTestCase{
+	cases := []handlerDeleteTestCase{
 		{"1", http.StatusOK, emptyStr},
 		{"badparam", http.StatusUnprocessableEntity, emptyStr},
 	}
@@ -144,22 +121,15 @@ func TestHandler_DeletePage(t *testing.T) {
 	}
 }
 
-type handlerUpdatePageTestCase struct {
-	id                        string
-	inputData                 string
-	responseCode              int
-	responseBodyShouldContain string
-}
-
 func TestHandler_UpdatePage(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	_ = ps.Create(&pages.Page{
 		Title: "Page 1",
 		Text:  "Page 1 text",
 	})
 
-	cases := []handlerUpdatePageTestCase{
+	cases := []handlerUpdateTestCase{
 		{"1", `{"page":{"title":"Page 1 updated","text":"Page 1 updated text"}}`, http.StatusOK, `"title":"Page 1 updated","text":"Page 1 updated text"`},
 		{"badparam", `{"page":{"title":"Page 1 updated","text":"Page 1 updated text"}}`, http.StatusUnprocessableEntity, emptyStr},
 		{"1", `{"page":{"text":"Page 1 updated text"}}`, http.StatusUnprocessableEntity, emptyStr},
@@ -178,7 +148,7 @@ func TestHandler_UpdatePage(t *testing.T) {
 		err := h.UpdatePage(c)
 
 		if err != nil {
-			t.Errorf("[%d] Fail to delete page. Error: %s, id: %s", caseNum, err.Error(), item.id)
+			t.Errorf("[%d] Fail to update page. Error: %s, id: %s", caseNum, err.Error(), item.id)
 		}
 
 		if rec.Code != item.responseCode {
@@ -203,7 +173,7 @@ type handlerListPagesTestCase struct {
 }
 
 func TestHandler_ListPages(t *testing.T) {
-	e, h, ps := setup()
+	e, h, ps := setupPageHandlerTest()
 
 	pagesToCreate := []*pages.Page{
 		{Title: "Page 1", Text: "Page 1 text"},
@@ -234,13 +204,13 @@ func TestHandler_ListPages(t *testing.T) {
 			Data:  []*pages.Page{pagesToCreate[2]},
 		}},
 		{map[string]string{
-			"limit":  "-1",
-			"offset": "0",
-			"sort":   "id",
-			"desc":   "true",
+			"limit":      "-1",
+			"offset":     "0",
+			"sort":       "id",
+			"descending": "true",
 		}, http.StatusOK, &listPagesResponse{
 			Total: 3,
-			Data:  pagesToCreate,
+			Data:  []*pages.Page{pagesToCreate[2], pagesToCreate[1], pagesToCreate[0]},
 		}},
 	}
 
@@ -299,7 +269,7 @@ func TestHandler_ListPages(t *testing.T) {
 	}
 }
 
-func setup() (*echo.Echo, *Handler, *store.Memory) {
+func setupPageHandlerTest() (*echo.Echo, *Handler, *store.Memory) {
 	e := router.New()
 
 	ps := store.NewMemory(&store.MemoryConfig{

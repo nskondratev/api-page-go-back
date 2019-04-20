@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/nskondratev/api-page-go-back/events"
 	"github.com/nskondratev/api-page-go-back/logger"
@@ -68,12 +69,39 @@ func (s *Gorm) Create(e *events.Event) error {
 }
 
 func (s *Gorm) Update(e *events.Event) error {
+	res := s.db.First(&events.Event{}, e.ID)
+
+	if res.Error != nil {
+		if gorm.IsRecordNotFoundError(res.Error) {
+			return fmt.Errorf("[events.store.gorm] page with id = %d does not exist", e.ID)
+		}
+		return res.Error
+	}
+
 	if err := s.db.Delete(&events.Field{}, "eventId = ?", e.ID).Error; err != nil {
 		return err
 	}
-	return s.db.Save(&e).Error
+
+	res = s.db.Save(&e)
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("[events.store.gorm] page with id = %d was not updated", e.ID)
+	}
+
+	return nil
 }
 
 func (s *Gorm) Delete(e *events.Event) error {
-	return s.db.Delete(e).Error
+	res := s.db.Delete(e)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected < 1 {
+		return fmt.Errorf("[events.store.gorm] page with id = %d was not deleted", e.ID)
+	}
+	return nil
 }
