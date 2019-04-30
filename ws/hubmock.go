@@ -4,7 +4,7 @@ import "net/http"
 
 type HubMock struct{}
 
-func NewHubMock() *HubMock {
+func NewHubMock() IHub {
 	return &HubMock{}
 }
 

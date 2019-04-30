@@ -18,7 +18,7 @@ type GormConfig struct {
 	Logger logger.Logger
 }
 
-func NewGorm(c *GormConfig) *Gorm {
+func NewGorm(c *GormConfig) pages.Store {
 	return &Gorm{
 		db:     c.DB,
 		logger: c.Logger,
