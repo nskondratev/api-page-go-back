@@ -9,11 +9,9 @@ import (
 )
 
 type pageUpdateRequest struct {
-	Page struct {
-		ID    uint64 `json:"id" validate:"required"`
-		Title string `json:"title" validate:"required"`
-		Text  string `json:"text" validate:"required"`
-	} `json:"page"`
+	ID    uint64 `json:"id" validate:"required"`
+	Title string `json:"title" validate:"required"`
+	Text  string `json:"text" validate:"required"`
 }
 
 func (r *pageUpdateRequest) bind(c echo.Context, p *pages.Page) error {
@@ -24,21 +22,19 @@ func (r *pageUpdateRequest) bind(c echo.Context, p *pages.Page) error {
 	if err != nil {
 		return err
 	}
-	r.Page.ID = id
+	r.ID = id
 	if err := c.Validate(r); err != nil {
 		return err
 	}
-	p.ID = r.Page.ID
-	p.Title = r.Page.Title
-	p.Text = r.Page.Text
+	p.ID = r.ID
+	p.Title = r.Title
+	p.Text = r.Text
 	return nil
 }
 
 type pageCreateRequest struct {
-	Page struct {
-		Title string `json:"title" validate:"required"`
-		Text  string `json:"text" validate:"required"`
-	} `json:"page"`
+	Title string `json:"title" validate:"required"`
+	Text  string `json:"text" validate:"required"`
 }
 
 func (r *pageCreateRequest) bind(c echo.Context, p *pages.Page) error {
@@ -48,25 +44,25 @@ func (r *pageCreateRequest) bind(c echo.Context, p *pages.Page) error {
 	if err := c.Validate(r); err != nil {
 		return err
 	}
-	p.Title = r.Page.Title
-	p.Text = r.Page.Text
+	p.Title = r.Title
+	p.Text = r.Text
 	return nil
 }
 
+type fieldsRequest struct {
+	Key         util.NullString `json:"key" validate:"required"`
+	Type        string          `json:"type" validate:"required"`
+	Required    bool            `json:"required" validate:"required"`
+	Description string          `json:"description" validate:"required"`
+}
+
 type eventCreateRequest struct {
-	Event struct {
-		Label       util.NullString `json:"label"`
-		Constant    string          `json:"constant" validate:"required"`
-		Value       string          `json:"value" validate:"required"`
-		Description string          `json:"description" validate:"required"`
-		Type        string          `json:"type" validate:"required"`
-		Fields      []struct {
-			Key         util.NullString `json:"key" validate:"required"`
-			Type        string          `json:"type" validate:"required"`
-			Required    bool            `json:"required" validate:"required"`
-			Description string          `json:"description" validate:"required"`
-		} `json:"fields"`
-	} `json:"event"`
+	Label       util.NullString `json:"label"`
+	Constant    string          `json:"constant" validate:"required"`
+	Value       string          `json:"value" validate:"required"`
+	Description string          `json:"description" validate:"required"`
+	Type        string          `json:"type" validate:"required"`
+	Fields      []fieldsRequest `json:"fields"`
 }
 
 func (r *eventCreateRequest) bind(c echo.Context, e *events.Event) error {
@@ -76,13 +72,13 @@ func (r *eventCreateRequest) bind(c echo.Context, e *events.Event) error {
 	if err := c.Validate(r); err != nil {
 		return err
 	}
-	e.Label = r.Event.Label
-	e.Constant = r.Event.Constant
-	e.Value = r.Event.Value
-	e.Description = r.Event.Description
-	e.Type = r.Event.Type
-	e.Fields = make([]events.Field, len(r.Event.Fields), len(r.Event.Fields))
-	for index, element := range r.Event.Fields {
+	e.Label = r.Label
+	e.Constant = r.Constant
+	e.Value = r.Value
+	e.Description = r.Description
+	e.Type = r.Type
+	e.Fields = make([]events.Field, len(r.Fields), len(r.Fields))
+	for index, element := range r.Fields {
 		f := events.Field{
 			Key:         element.Key,
 			Type:        element.Type,
@@ -95,20 +91,13 @@ func (r *eventCreateRequest) bind(c echo.Context, e *events.Event) error {
 }
 
 type eventUpdateRequest struct {
-	Event struct {
-		ID          uint64          `json:"id" validate:"required"`
-		Label       util.NullString `json:"label"`
-		Constant    string          `json:"constant" validate:"required"`
-		Value       string          `json:"value" validate:"required"`
-		Description string          `json:"description" validate:"required"`
-		Type        string          `json:"type" validate:"required"`
-		Fields      []struct {
-			Key         util.NullString `json:"key" validate:"required"`
-			Type        string          `json:"type" validate:"required"`
-			Required    bool            `json:"required" validate:"required"`
-			Description string          `json:"description" validate:"required"`
-		} `json:"fields"`
-	} `json:"event"`
+	ID          uint64          `json:"id" validate:"required"`
+	Label       util.NullString `json:"label"`
+	Constant    string          `json:"constant" validate:"required"`
+	Value       string          `json:"value" validate:"required"`
+	Description string          `json:"description" validate:"required"`
+	Type        string          `json:"type" validate:"required"`
+	Fields      []fieldsRequest `json:"fields"`
 }
 
 func (r *eventUpdateRequest) bind(c echo.Context, e *events.Event) error {
@@ -119,18 +108,18 @@ func (r *eventUpdateRequest) bind(c echo.Context, e *events.Event) error {
 	if err != nil {
 		return err
 	}
-	r.Event.ID = id
+	r.ID = id
 	if err := c.Validate(r); err != nil {
 		return err
 	}
-	e.ID = r.Event.ID
-	e.Label = r.Event.Label
-	e.Constant = r.Event.Constant
-	e.Value = r.Event.Value
-	e.Description = r.Event.Description
-	e.Type = r.Event.Type
-	e.Fields = make([]events.Field, len(r.Event.Fields), len(r.Event.Fields))
-	for index, element := range r.Event.Fields {
+	e.ID = r.ID
+	e.Label = r.Label
+	e.Constant = r.Constant
+	e.Value = r.Value
+	e.Description = r.Description
+	e.Type = r.Type
+	e.Fields = make([]events.Field, len(r.Fields), len(r.Fields))
+	for index, element := range r.Fields {
 		f := events.Field{
 			Key:         element.Key,
 			Type:        element.Type,

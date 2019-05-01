@@ -20,9 +20,9 @@ func TestHandler_CreateEvent(t *testing.T) {
 	e, h, _ := setupEventHandlerTest()
 
 	cases := []handlerCreateTestCase{
-		{`{"event":{"constant":"Constant 1","value":"Value 1","label":"Label 1","description":"Description 1","type":"frontend"}}`, http.StatusOK, `{"id":1,"constant":"Constant 1","label":"Label 1","value":"Value 1","description":"Description 1","type":"frontend","fields":[],"createdAt":`},
-		{`{"event":{"constant":"Constant 1","value":"Value 1","label":"Label 1,"description":"Description 1}`, http.StatusUnprocessableEntity, emptyStr},
-		{`{"event":{"value":"Value 1"}}`, http.StatusUnprocessableEntity, emptyStr},
+		{`{"constant":"Constant 1","value":"Value 1","label":"Label 1","description":"Description 1","type":"frontend"}`, http.StatusOK, `{"id":1,"constant":"Constant 1","label":"Label 1","value":"Value 1","description":"Description 1","type":"frontend","fields":[],"createdAt":`},
+		{`{"constant":"Constant 1","value":"Value 1","label":"Label 1,"description":"Description 1}`, http.StatusUnprocessableEntity, emptyStr},
+		{`{"value":"Value 1"}`, http.StatusUnprocessableEntity, emptyStr},
 	}
 
 	for caseNum, item := range cases {
@@ -164,10 +164,10 @@ func TestHandler_UpdateEvent(t *testing.T) {
 	}
 
 	cases := []handlerUpdateTestCase{
-		{"1", `{"event":{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1","description":"Description 1","type":"frontend"}}`, http.StatusOK, `"id":1,"constant":"Constant 1 updated","label":"Label 1","value":"Value 1 updated","description":"Description 1","type":"frontend","fields":[],"createdAt"`},
-		{"badparam", `{"event":{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1","description":"Description 1","type":"frontend"}}`, http.StatusUnprocessableEntity, emptyStr},
-		{"1", `{"event":{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1"}}`, http.StatusUnprocessableEntity, emptyStr},
-		{"1", `{"event":{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1","description":"Description 1","type":"frontend}`, http.StatusUnprocessableEntity, emptyStr},
+		{"1", `{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1","description":"Description 1","type":"frontend"}`, http.StatusOK, `"id":1,"constant":"Constant 1 updated","label":"Label 1","value":"Value 1 updated","description":"Description 1","type":"frontend","fields":[],"createdAt"`},
+		{"badparam", `{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1","description":"Description 1","type":"frontend"}`, http.StatusUnprocessableEntity, emptyStr},
+		{"1", `{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1"}`, http.StatusUnprocessableEntity, emptyStr},
+		{"1", `{"constant":"Constant 1 updated","value":"Value 1 updated","label":"Label 1","description":"Description 1","type":"frontend}`, http.StatusUnprocessableEntity, emptyStr},
 	}
 
 	for caseNum, item := range cases {

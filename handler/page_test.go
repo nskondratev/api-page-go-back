@@ -19,9 +19,9 @@ func TestHandler_CreatePage(t *testing.T) {
 	e, h, _ := setupPageHandlerTest()
 
 	cases := []handlerCreateTestCase{
-		{`{"page":{"title":"page1","text":"Page 1 text"}}`, http.StatusOK, `"id":1,"title":"page1","text":"Page 1 text"`},
-		{`{"page":{"title":"page1","text":"Page 1 text}`, http.StatusUnprocessableEntity, emptyStr},
-		{`{"page":{"text":"Page 1 text"}}`, http.StatusUnprocessableEntity, emptyStr},
+		{`{"title":"page1","text":"Page 1 text"}`, http.StatusOK, `"id":1,"title":"page1","text":"Page 1 text"`},
+		{`{"title":"page1","text":"Page 1 text}`, http.StatusUnprocessableEntity, emptyStr},
+		{`{"text":"Page 1 text"}`, http.StatusUnprocessableEntity, emptyStr},
 	}
 
 	for caseNum, item := range cases {
@@ -130,10 +130,10 @@ func TestHandler_UpdatePage(t *testing.T) {
 	})
 
 	cases := []handlerUpdateTestCase{
-		{"1", `{"page":{"title":"Page 1 updated","text":"Page 1 updated text"}}`, http.StatusOK, `"title":"Page 1 updated","text":"Page 1 updated text"`},
-		{"badparam", `{"page":{"title":"Page 1 updated","text":"Page 1 updated text"}}`, http.StatusUnprocessableEntity, emptyStr},
-		{"1", `{"page":{"text":"Page 1 updated text"}}`, http.StatusUnprocessableEntity, emptyStr},
-		{"1", `{"page":{"title":"Page 1 updated","text":"Page 1 updated text}`, http.StatusUnprocessableEntity, emptyStr},
+		{"1", `{"title":"Page 1 updated","text":"Page 1 updated text"}`, http.StatusOK, `"title":"Page 1 updated","text":"Page 1 updated text"`},
+		{"badparam", `{"title":"Page 1 updated","text":"Page 1 updated text"}`, http.StatusUnprocessableEntity, emptyStr},
+		{"1", `{"text":"Page 1 updated text"}`, http.StatusUnprocessableEntity, emptyStr},
+		{"1", `{"title":"Page 1 updated","text":"Page 1 updated text}`, http.StatusUnprocessableEntity, emptyStr},
 	}
 
 	for caseNum, item := range cases {
