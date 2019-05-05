@@ -1,4 +1,0 @@
-# HTTP API
-## Pages
-
-## Events

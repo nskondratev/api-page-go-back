@@ -26,5 +26,4 @@ sudo systemctl start api-page-backend
 ```
 
 ## API Docs
-* [HTTP API](docs/HTTP_API.md)
 * [Websockets API](docs/WS_API.md)
